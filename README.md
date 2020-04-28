@@ -1,3 +1,5 @@
+# alien_dictionary
+
 Input: words[] = {"baa", "abcd", "abca", "cab", "cad"}
 Output: Order of characters is 'b', 'd', 'a', 'c'
 Note that words are sorted and in the given language "baa"
