@@ -23,20 +23,19 @@ const calculateDictionary = (words: string[]) => {
 
   let letterPosition = 0;
 
-  let valid = false;
   let mapCharacters: MapCharacter[] = [];
   let currentCharacter: MapCharacter | undefined;
   do {
     for (let word = 0; word < words.length; word++) {
       if (
         words[word][letterPosition] &&
-        !dictionary.find((elem: string) => elem == words[word][letterPosition])
+        !dictionary.find((elem: string) => elem === words[word][letterPosition])
       ) {
         if (letterPosition == 0) {
-          //On the first column we don't care about letter in the middle
+          //On the first column we don't care about letter the order, because they're already ordered
           dictionary.push(words[word][letterPosition]);
         } else {
-          //we check if the letter was already on our "watchlist"
+          // we check if the letter was already on our "watchlist"
           currentCharacter = mapCharacters.find(
             (elem: MapCharacter) =>
               elem.character == words[word][letterPosition]
@@ -51,23 +50,25 @@ const calculateDictionary = (words: string[]) => {
           }
           for (let word2 = 0; word2 < word; word2++) {
             if (isSameParentWord(words[word], words[word2])) {
-              currentCharacter.biggerThan = dictionary.findIndex(
+              const biggerThan = dictionary.findIndex(
                 (elem: string) => elem === words[word2][letterPosition]
               );
+              if (currentCharacter.biggerThan < biggerThan) {
+                currentCharacter.biggerThan = biggerThan;
+              }
             }
           }
           for (let word2 = word; word2 < words.length - 1; word2++) {
             if (isSameParentWord(words[word], words[word2])) {
-              currentCharacter.smallerThan = dictionary.findIndex(
+              const smallerThan = dictionary.findIndex(
                 (elem: string) => elem === words[word2][letterPosition - 1]
               );
+              if (currentCharacter.smallerThan > smallerThan) {
+                currentCharacter.smallerThan = smallerThan;
+              }
             }
           }
-          if (
-            currentCharacter.smallerThan - currentCharacter.biggerThan ===
-            2
-          ) {
-            //we find the position in the middle between 2 numbers
+          if (currentCharacter.smallerThan - currentCharacter.biggerThan <= 2) {
             const position =
               (currentCharacter.smallerThan + currentCharacter.biggerThan) / 2;
             dictionary.splice(position, 0, currentCharacter.character);
@@ -76,12 +77,8 @@ const calculateDictionary = (words: string[]) => {
       }
     }
 
-    if (dictionary.length == possibleCharacters.length) {
-      valid = true;
-    } else {
-      letterPosition++;
-    }
-  } while (!valid);
+    letterPosition++;
+  } while (dictionary.length != possibleCharacters.length);
 
   return dictionary;
 };
